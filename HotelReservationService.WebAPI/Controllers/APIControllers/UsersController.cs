@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using HotelReservationService.Core.IServices;
 using HotelReservationService.Core.Models.ViewModels;
 using System.Threading.Tasks;
+using HotelReservationService.Core.Models.ViewModels.UserManagement.User;
 
 #endregion
 
@@ -54,13 +55,15 @@ namespace HotelReservationService.WebAPI.Controllers.APIControllers
         [AllowAnonymous]
         [Route("Register")]
         [HttpPost]
-        public async Task<UserViewModel> SignUp(UserViewModel model)
+        public async Task<IActionResult> SignUp(UserInputModel model)
         {
-
-            model.IsActive = true;
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var result = await this._UsersService.AddAsync(model);
 
-            return result;
+            return Ok(result);
         }
         #endregion
     }

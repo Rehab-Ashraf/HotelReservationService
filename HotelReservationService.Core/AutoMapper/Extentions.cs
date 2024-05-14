@@ -1,6 +1,7 @@
 #region Using ...
 using HotelReservationService.Core.Models.ViewModels;
 using HotelReservationService.Core.Models.ViewModels.Reservation;
+using HotelReservationService.Core.Models.ViewModels.UserManagement.User;
 using HotelReservationService.Entity.Entities;
 
 
@@ -26,6 +27,17 @@ namespace HotelReservationService.Core
         public static UserViewModel ToModel(this User entity, AutoMapper.IMapper mapper)
         {
             var result = mapper.Map<User, UserViewModel>(entity);
+            return result;
+        }
+
+        public static User ToInputEntity(this UserInputModel model, AutoMapper.IMapper mapper)
+        {
+            var result = mapper.Map<UserInputModel, User>(model);
+            return result;
+        }
+        public static UserInputModel ToInputModel(this User entity, AutoMapper.IMapper mapper)
+        {
+            var result = mapper.Map<User, UserInputModel>(entity);
             return result;
         }
         #endregion

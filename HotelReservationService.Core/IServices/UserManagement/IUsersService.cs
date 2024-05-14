@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using HotelReservationService.Core.Models.ViewModels;
+using HotelReservationService.Core.Models.ViewModels.UserManagement.User;
 #endregion
 
 /*
@@ -16,9 +17,9 @@ namespace HotelReservationService.Core.IServices
     public interface IUsersService
     {
         #region Methods
-        Task ValidateModelAsync(UserViewModel model);
+        Task ValidateModelAsync(UserInputModel model);
 
-        Task<UserViewModel> AddAsync(UserViewModel model);
+        Task<UserInputModel> AddAsync(UserInputModel model);
 
         UserLoggedInViewModel Login(LoginViewModel model);
         #endregion

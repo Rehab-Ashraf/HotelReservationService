@@ -13,6 +13,7 @@ using Framework.Common.Exceptions;
 using HotelReservationService.Common.Enums;
 using System.Linq;
 using Microsoft.Extensions.Hosting;
+using HotelReservationService.Entity.Entities;
 
 namespace HotelReservationService.Business.Services
 {
@@ -51,9 +52,17 @@ namespace HotelReservationService.Business.Services
             query = await this._reservationRepositoryAsync.SetSortOrderAsync(query, searchModel.Sorting);
 
             query = await this._reservationRepositoryAsync.SetPaginationAsync(query, searchModel.Pagination);
-
+            DateTime date = DateTime.Now;
             var entityList = query.Select(x => new ReservationLightViewModel
             {
+                Id = x.Id,
+                DateFrom = x.DateFrom,
+                DateTo = x.DateTo,
+                RoomId = x.RoomId,
+                RoomNumber = x.Room.RoomNumber,
+                UserId = x.UserId,
+                UserName = x.User.Name,
+                Status = ( x.DateFrom <= date)?ReservationStatus.Past: ReservationStatus.Upcoming
 
             }).ToList();
             var result = new GenericResult<IList<ReservationLightViewModel>>
@@ -70,7 +79,7 @@ namespace HotelReservationService.Business.Services
             {
 
                 var existUser = this._UsersRepositoryAsync.GetAsync(null).Result.FirstOrDefault(entity =>
-                        entity.Id == model.Id && !entity.IsDeleted && entity.IsActive);
+                        entity.Id == model.UserId && !entity.IsDeleted && entity.IsActive);
                 if (existUser == null)
                     throw new ItemAlreadyExistException((int)ErrorCode.NotFoundUser);
 
@@ -91,10 +100,15 @@ namespace HotelReservationService.Business.Services
             entity.CreatedByUserId = _currentUserService.CurrentUserId;
             entity = await this._reservationRepositoryAsync.AddAsync(entity);
 
+            try
+            {
+                #region Commit Changes
+                await this._unitOfWorkAsync.CommitAsync();
+                #endregion
+            }catch(Exception ex)
+            {
 
-            #region Commit Changes
-            await this._unitOfWorkAsync.CommitAsync();
-            #endregion
+            }
 
             var result = entity.ToModel(this._mapper);
             return result.Id;

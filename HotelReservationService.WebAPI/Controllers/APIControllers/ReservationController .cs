@@ -35,10 +35,9 @@ namespace HotelReservationService.WebAPI.Controllers.APIControllers
             return Ok(reservationId);
         }
 
-        [Route("GetAll/{userId}")]
-        [HttpGet]
+        [HttpPost("GetAll")]
         [JwtAuthentication(Permissions.ReservationList)]
-        public async Task<GenericResult<IList<ReservationLightViewModel>>> GetAll(ReservationSearchModel model)
+        public async Task<GenericResult<IList<ReservationLightViewModel>>> GetAll([FromBody]ReservationSearchModel model)
         {
             var reservations = await _reservationService.GetAllAsync(model);
             return reservations;

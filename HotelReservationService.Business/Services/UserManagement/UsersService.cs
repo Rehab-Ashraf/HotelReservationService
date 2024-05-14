@@ -16,6 +16,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using HotelReservationService.Core.Models.ViewModels.UserManagement.User;
 #endregion
 
 
@@ -49,7 +50,7 @@ namespace HotelReservationService.Business.Services
             _rolesRepositoryAsync = rolesRepositoryAsync;
         }
 
-        public async Task ValidateModelAsync(UserViewModel model)
+        public async Task ValidateModelAsync(UserInputModel model)
         {
             await Task.Run(() =>
             {
@@ -63,22 +64,23 @@ namespace HotelReservationService.Business.Services
             });
         }
 
-        public async Task<UserViewModel> AddAsync(UserViewModel model)
+        public async Task<UserInputModel> AddAsync(UserInputModel model)
         {
 
             await this.ValidateModelAsync(model);
-            var entity = model.ToEntity(this._mapper);
+            var entity = model.ToInputEntity(this._mapper);
             entity.CreatedByUserId = _currentUserService.CurrentUserId;
-            entity.Password = HashPass.HashPassword("HotelReservation@123456");
+            entity.Password = HashPass.HashPassword(model.Password);
             var role = await _rolesRepositoryAsync.FirstOrDefaultAsync(x => x.Name.Contains("User"));
             entity.RoleId = role != null ? role.Id : 2;
+            entity.IsActive = true;
             entity = await this._UsersRepositoryAsync.AddAsync(entity);
             
 
             #region Commit Changes
             await this._unitOfWorkAsync.CommitAsync();
             #endregion
-            var result = entity.ToModel(this._mapper);
+            var result = entity.ToInputModel(this._mapper);
             return result;
         }
 
